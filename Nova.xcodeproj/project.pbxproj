@@ -11,7 +11,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1A98047E301B12EF00F8702E /* Nova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Nova.app; path = "/Users/wahab/Desktop/Nova/build/Debug-iphoneos/Nova.app"; sourceTree = "<absolute>"; };
+		1A92B6AE301B43D90068127E /* Nova.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nova.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		414D431F13BF3EE31CBE63C6 /* Pods-Nova.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nova.release.xcconfig"; path = "Target Support Files/Pods-Nova/Pods-Nova.release.xcconfig"; sourceTree = "<group>"; };
 		DF756158CBC516C02BE3BA10 /* Pods-Nova.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Nova.debug.xcconfig"; path = "Target Support Files/Pods-Nova/Pods-Nova.debug.xcconfig"; sourceTree = "<group>"; };
 		EB8DA740B460B228C90A1C05 /* Pods_Nova.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Nova.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -50,6 +50,7 @@
 		1A98047F301B12EF00F8702E /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				1A92B6AE301B43D90068127E /* Nova.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -93,7 +94,7 @@
 			);
 			name = Nova;
 			productName = Nova;
-			productReference = 1A98047E301B12EF00F8702E /* Nova.app */;
+			productReference = 1A92B6AE301B43D90068127E /* Nova.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
