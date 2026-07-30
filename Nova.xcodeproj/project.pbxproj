@@ -17,9 +17,22 @@
 		EB8DA740B460B228C90A1C05 /* Pods_Nova.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Nova.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		1A92B6C7301B6F230068127E /* Exceptions for "Nova" folder in "Nova" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Core/Utilities/Secrets.example.txt,
+			);
+			target = 1A98047D301B12EF00F8702E /* Nova */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		1A980480301B12EF00F8702E /* Nova */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				1A92B6C7301B6F230068127E /* Exceptions for "Nova" folder in "Nova" target */,
+			);
 			path = Nova;
 			sourceTree = "<group>";
 		};
