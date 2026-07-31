@@ -10,26 +10,31 @@ import SwiftUI
 struct RootView: View {
     @State private var showSplash = true
     @State private var onboardingComplete = false
+    @StateObject private var authManager = AuthManager.shared
 
     var body: some View {
-        if showSplash {
-            SplashView()
-                .onAppear {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                        withAnimation {
-                            showSplash = false
+        Group {
+            if showSplash {
+                SplashView()
+                    .onAppear {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 6) {
+                            withAnimation {
+                                showSplash = false
+                            }
                         }
                     }
+            } else if authManager.isLoggedIn {
+                HomeView()
+            } else if !onboardingComplete {
+                OnboardingView(onFinish: {
+                    withAnimation {
+                        onboardingComplete = true
+                    }
+                })
+            } else {
+                NavigationStack {
+                    LoginView()
                 }
-        } else if !onboardingComplete {
-            OnboardingView(onFinish: {
-                withAnimation {
-                    onboardingComplete = true
-                }
-            })
-        } else {
-            NavigationStack {
-                LoginView()
             }
         }
     }

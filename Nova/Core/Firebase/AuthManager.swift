@@ -7,31 +7,36 @@
 
 import Foundation
 import FirebaseAuth
+import Combine
 
-final class AuthManager {
+@MainActor
+final class AuthManager: ObservableObject {
     static let shared = AuthManager()
-    private init() {}
+    private init() {
+        self.isLoggedIn = Auth.auth().currentUser != nil
+    }
+    
+    @Published var isLoggedIn: Bool
     
     var currentUser: FirebaseAuth.User? {
         Auth.auth().currentUser
     }
     
-    var isLoggedIn: Bool {
-        currentUser != nil
-    }
-    
     func signUp(email: String, password: String) async throws -> FirebaseAuth.User {
         let result = try await Auth.auth().createUser(withEmail: email, password: password)
+        isLoggedIn = true
         return result.user
     }
     
     func signIn(email: String, password: String) async throws -> FirebaseAuth.User {
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
+        isLoggedIn = true
         return result.user
     }
     
     func signOut() throws {
         try Auth.auth().signOut()
+        isLoggedIn = false
     }
     
     func sendPasswordReset(email: String) async throws {
