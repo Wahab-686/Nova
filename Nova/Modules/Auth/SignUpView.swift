@@ -1,0 +1,79 @@
+//
+//  SignUpView.swift
+//  Nova
+//
+//  Created by Wahab on 31/07/2026.
+//
+
+import SwiftUI
+
+struct SignUpView: View {
+    @State private var name = ""
+    @State private var email = ""
+    @State private var password = ""
+    
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 24) {
+                    Spacer().frame(height: 60)
+                    
+                    Text("Create Account")
+                        .font(.system(size: 32, weight: .bold, design: .rounded))
+                        .foregroundColor(.white)
+                    
+                    Text("Join the creative community")
+                        .font(.subheadline)
+                        .foregroundColor(.white.opacity(0.6))
+                    
+                    Spacer().frame(height: 20)
+                    
+                    VStack(spacing: 16) {
+                        TextField("", text: $name, prompt: Text("Full Name").foregroundColor(.white.opacity(0.4)))
+                            .textFieldStyle(NovaTextFieldStyle())
+                        
+                        TextField("", text: $email, prompt: Text("Email").foregroundColor(.white.opacity(0.4)))
+                            .textFieldStyle(NovaTextFieldStyle())
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                        
+                        SecureField("", text: $password, prompt: Text("Password").foregroundColor(.white.opacity(0.4)))
+                            .textFieldStyle(NovaTextFieldStyle())
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    Button {
+                        
+                    } label: {
+                        Text("Sign Up")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.purple)
+                            .cornerRadius(14)
+                    }
+                    .padding(.horizontal, 24)
+                    
+                    HStack {
+                        Text("Already have an account?")
+                            .foregroundColor(.white.opacity(0.6))
+                        Button("Sign In") {
+                            
+                        }
+                        .foregroundColor(.purple)
+                    }
+                    .font(.footnote)
+                    
+                    Spacer()
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    SignUpView()
+}
