@@ -11,6 +11,7 @@ struct SignUpView: View {
     @State private var name = ""
     @State private var email = ""
     @State private var password = ""
+    @StateObject private var viewModel = AuthViewModel()
     
     var body: some View {
         ZStack {
@@ -44,17 +45,36 @@ struct SignUpView: View {
                     }
                     .padding(.horizontal, 24)
                     
-                    Button {
-                        
-                    } label: {
-                        Text("Sign Up")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.purple)
-                            .cornerRadius(14)
+                    if let error = viewModel.errorMessage {
+                        Text(error)
+                            .font(.footnote)
+                            .foregroundColor(.red)
+                            .padding(.horizontal, 24)
                     }
+                    
+                    Button {
+                        Task {
+                            await viewModel.signUp(email: email, password: password)
+                        }
+                    } label: {
+                        if viewModel.isLoading {
+                            ProgressView()
+                                .tint(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.purple)
+                                .cornerRadius(14)
+                        } else {
+                            Text("Sign Up")
+                                .font(.headline)
+                                .foregroundColor(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding()
+                                .background(Color.purple)
+                                .cornerRadius(14)
+                        }
+                    }
+                    .disabled(viewModel.isLoading)
                     .padding(.horizontal, 24)
                     
                     HStack {
