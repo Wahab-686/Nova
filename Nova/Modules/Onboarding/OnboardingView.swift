@@ -9,6 +9,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @State private var currentPage = 0
+    let onFinish: () -> Void
     
     var body: some View {
         ZStack {
@@ -23,6 +24,24 @@ struct OnboardingView: View {
             }
             .tabViewStyle(.page(indexDisplayMode: .always))
             .indexViewStyle(.page(backgroundDisplayMode: .always))
+            
+            VStack {
+                Spacer()
+                if currentPage == onboardingSlides.count - 1 {
+                    Button(action: onFinish) {
+                        Text("Get Started")
+                            .font(.headline)
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.purple)
+                            .cornerRadius(14)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 70)
+                    .transition(.opacity)
+                }
+            }
         }
     }
 }
@@ -68,5 +87,5 @@ struct OnboardingSlideView: View {
 }
 
 #Preview {
-    OnboardingView()
+    OnboardingView(onFinish: {})
 }
