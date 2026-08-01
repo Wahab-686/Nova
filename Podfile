@@ -6,4 +6,5 @@ target 'Nova' do
   pod 'Firebase/Auth'
   pod 'Firebase/Firestore'
   pod 'Firebase/Messaging'
+  pod 'GoogleSignIn'
 end
