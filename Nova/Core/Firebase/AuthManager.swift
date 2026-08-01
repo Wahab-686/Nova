@@ -18,9 +18,15 @@ final class AuthManager: ObservableObject {
     
     @Published var isLoggedIn: Bool
     @Published var isEmailVerified: Bool = Auth.auth().currentUser?.isEmailVerified ?? false
+    @Published var verificationID: String?
     
     var currentUser: FirebaseAuth.User? {
         Auth.auth().currentUser
+    }
+    
+    var needsEmailVerification: Bool {
+        guard let user = Auth.auth().currentUser, user.email != nil else { return false }
+        return !user.isEmailVerified
     }
     
     func signUp(email: String, password: String) async throws -> FirebaseAuth.User {
@@ -56,5 +62,21 @@ final class AuthManager: ObservableObject {
         try await user.reload()
         isEmailVerified = user.isEmailVerified
         return user.isEmailVerified
+    }
+    
+    func sendOTP(phoneNumber: String) async throws {
+        let id = try await PhoneAuthProvider.provider().verifyPhoneNumber(phoneNumber, uiDelegate: nil)
+        verificationID = id
+    }
+    
+    func verifyOTP(code: String) async throws -> FirebaseAuth.User {
+        guard let verificationID = verificationID else {
+            throw NSError(domain: "Auth", code: -1, userInfo: [NSLocalizedDescriptionKey: "No verification ID found. Please request OTP again."])
+        }
+        let credential = PhoneAuthProvider.provider().credential(withVerificationID: verificationID, verificationCode: code)
+        let result = try await Auth.auth().signIn(with: credential)
+        isLoggedIn = true
+        isEmailVerified = result.user.isEmailVerified 
+        return result.user
     }
 }

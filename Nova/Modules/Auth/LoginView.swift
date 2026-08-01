@@ -100,6 +100,21 @@ struct LoginView: View {
                     VStack(spacing: 12) {
                         SocialLoginButton(title: "Continue with Google", icon: "globe")
                         SocialLoginButton(title: "Continue with Apple", icon: "apple.logo")
+                        
+                        NavigationLink {
+                             PhoneEntryView()
+                         } label: {
+                             HStack {
+                                 Image(systemName: "phone.fill")
+                                 Text("Continue with Phone")
+                             }
+                             .font(.subheadline.bold())
+                             .foregroundColor(.white)
+                             .frame(maxWidth: .infinity)
+                             .padding()
+                             .background(Color.white.opacity(0.08))
+                             .cornerRadius(14)
+                         }
                     }
                     .padding(.horizontal, 24)
                     

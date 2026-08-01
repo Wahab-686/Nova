@@ -16,6 +16,7 @@ final class AuthViewModel: ObservableObject {
     @Published var resetEmailSent = false
     @Published var needsEmailVerification = false
     @Published var isEmailVerified = false
+    @Published var otpSent = false
     
     func signUp(email: String, password: String) async {
         isLoading = true
@@ -78,5 +79,29 @@ final class AuthViewModel: ObservableObject {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+    
+    func sendOTP(phoneNumber: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            try await AuthManager.shared.sendOTP(phoneNumber: phoneNumber)
+            otpSent = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
+    
+    func verifyOTP(code: String) async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            _ = try await AuthManager.shared.verifyOTP(code: code)
+            isAuthenticated = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
     }
 }

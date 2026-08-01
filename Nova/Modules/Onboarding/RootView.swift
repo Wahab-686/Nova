@@ -10,7 +10,7 @@ import FirebaseAuth
  
 struct RootView: View {
     @State private var showSplash = true
-    @State private var onboardingComplete = false
+    @AppStorage("hasSeenOnboarding") private var hasSeenOnboarding = false
     @StateObject private var authManager = AuthManager.shared
  
     var body: some View {
@@ -25,15 +25,15 @@ struct RootView: View {
                         }
                     }
             } else if authManager.isLoggedIn {
-                if authManager.isEmailVerified {
-                    HomeView()
-                } else {
+                if authManager.needsEmailVerification {
                     EmailVerificationView()
+                } else {
+                    HomeView()
                 }
-            } else if !onboardingComplete {
+            } else if !hasSeenOnboarding {
                 OnboardingView(onFinish: {
                     withAnimation {
-                        onboardingComplete = true
+                        hasSeenOnboarding = true
                     }
                 })
             } else {
