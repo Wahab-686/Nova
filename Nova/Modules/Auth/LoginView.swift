@@ -44,8 +44,8 @@ struct LoginView: View {
                     
                     HStack {
                         Spacer()
-                        Button("Forgot Password?") {
-                            
+                        NavigationLink("Forgot Password?") {
+                            ForgotPasswordView()
                         }
                         .font(.footnote)
                         .foregroundColor(.purple)
