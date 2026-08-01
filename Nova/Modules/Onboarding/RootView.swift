@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
-
+import FirebaseAuth
+ 
 struct RootView: View {
     @State private var showSplash = true
     @State private var onboardingComplete = false
     @StateObject private var authManager = AuthManager.shared
-
+ 
     var body: some View {
         Group {
             if showSplash {
@@ -24,7 +25,11 @@ struct RootView: View {
                         }
                     }
             } else if authManager.isLoggedIn {
-                HomeView()
+                if authManager.isEmailVerified {
+                    HomeView()
+                } else {
+                    EmailVerificationView()
+                }
             } else if !onboardingComplete {
                 OnboardingView(onFinish: {
                     withAnimation {
@@ -39,3 +44,8 @@ struct RootView: View {
         }
     }
 }
+ 
+#Preview {
+    RootView()
+}
+ 

@@ -17,6 +17,7 @@ final class AuthManager: ObservableObject {
     }
     
     @Published var isLoggedIn: Bool
+    @Published var isEmailVerified: Bool = Auth.auth().currentUser?.isEmailVerified ?? false
     
     var currentUser: FirebaseAuth.User? {
         Auth.auth().currentUser
@@ -25,12 +26,14 @@ final class AuthManager: ObservableObject {
     func signUp(email: String, password: String) async throws -> FirebaseAuth.User {
         let result = try await Auth.auth().createUser(withEmail: email, password: password)
         isLoggedIn = true
+        isEmailVerified = result.user.isEmailVerified
         return result.user
     }
     
     func signIn(email: String, password: String) async throws -> FirebaseAuth.User {
         let result = try await Auth.auth().signIn(withEmail: email, password: password)
         isLoggedIn = true
+        isEmailVerified = result.user.isEmailVerified
         return result.user
     }
     
@@ -41,5 +44,17 @@ final class AuthManager: ObservableObject {
     
     func sendPasswordReset(email: String) async throws {
         try await Auth.auth().sendPasswordReset(withEmail: email)
+    }
+    
+    func sendEmailVerification() async throws {
+        guard let user = Auth.auth().currentUser else { return }
+        try await user.sendEmailVerification()
+    }
+    
+    func reloadUser() async throws -> Bool {
+        guard let user = Auth.auth().currentUser else { return false }
+        try await user.reload()
+        isEmailVerified = user.isEmailVerified
+        return user.isEmailVerified
     }
 }
