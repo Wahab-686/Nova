@@ -12,6 +12,14 @@
 				<string>app-1-149163809188-ios-dd0b4ad896e5a114e90931</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.149163809188-dj329p9ogrcgtlnhq65u3idol9g8k75f</string>
+			</array>
+		</dict>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

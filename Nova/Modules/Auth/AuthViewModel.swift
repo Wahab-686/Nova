@@ -104,4 +104,16 @@ final class AuthViewModel: ObservableObject {
         }
         isLoading = false
     }
+    
+    func signInWithGoogle() async {
+        isLoading = true
+        errorMessage = nil
+        do {
+            _ = try await AuthManager.shared.signInWithGoogle()
+            isAuthenticated = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+        isLoading = false
+    }
 }

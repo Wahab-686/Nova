@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import AuthenticationServices
 
 struct LoginView: View {
     @State private var email = ""
@@ -98,8 +99,30 @@ struct LoginView: View {
                     .padding(.horizontal, 24)
                     
                     VStack(spacing: 12) {
-                        SocialLoginButton(title: "Continue with Google", icon: "globe")
-                        SocialLoginButton(title: "Continue with Apple", icon: "apple.logo")
+                        SocialLoginButton(title: "Continue with Google", icon: "globe") {
+                            Task {
+                                await viewModel.signInWithGoogle()
+                            }
+                        }
+                        Button {
+                            
+                        } label: {
+                            HStack {
+                                Image(systemName: "apple.logo")
+                                Text("Continue with Apple")
+                                Spacer()
+                                Text("Coming soon")
+                                    .font(.caption)
+                                    .foregroundColor(.white.opacity(0.4))
+                            }
+                            .font(.subheadline.bold())
+                            .foregroundColor(.white.opacity(0.4))
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color.white.opacity(0.04))
+                            .cornerRadius(14)
+                        }
+                        .disabled(true)
                         
                         NavigationLink {
                              PhoneEntryView()
@@ -150,11 +173,11 @@ struct NovaTextFieldStyle: TextFieldStyle {
 struct SocialLoginButton: View {
     let title: String
     let icon: String
+    let action: () -> Void
     
     var body: some View {
-        Button {
+        Button(action: action) {
             
-        } label: {
             HStack {
                 Image(systemName: icon)
                 Text(title)
