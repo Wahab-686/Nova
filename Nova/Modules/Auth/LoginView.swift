@@ -104,25 +104,6 @@ struct LoginView: View {
                                 await viewModel.signInWithGoogle()
                             }
                         }
-                        Button {
-                            
-                        } label: {
-                            HStack {
-                                Image(systemName: "apple.logo")
-                                Text("Continue with Apple")
-                                Spacer()
-                                Text("Coming soon")
-                                    .font(.caption)
-                                    .foregroundColor(.white.opacity(0.4))
-                            }
-                            .font(.subheadline.bold())
-                            .foregroundColor(.white.opacity(0.4))
-                            .frame(maxWidth: .infinity)
-                            .padding()
-                            .background(Color.white.opacity(0.04))
-                            .cornerRadius(14)
-                        }
-                        .disabled(true)
                         
                         NavigationLink {
                              PhoneEntryView()

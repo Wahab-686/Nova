@@ -16,6 +16,7 @@ struct ProfileSetupView: View {
     @State private var profileImage: UIImage?
     @State private var isSaving = false
     @State private var errorMessage: String?
+    @State private var profileSaved = false
     
     var body: some View {
         ZStack {
@@ -101,6 +102,9 @@ struct ProfileSetupView: View {
                 }
             }
         }
+        .fullScreenCover(isPresented: $profileSaved) {
+            CreativeFocusView()
+        }
     }
     
     func saveProfile() async {
@@ -125,7 +129,7 @@ struct ProfileSetupView: View {
             )
             
             try await FirestoreManager.shared.setDocument(collection: "users", documentId: userId, data: user)
-            AuthManager.shared.hasProfile = true
+            profileSaved = true
         } catch {
             errorMessage = error.localizedDescription
         }
