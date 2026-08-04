@@ -23,6 +23,7 @@ final class AuthManager: ObservableObject {
     @Published var isLoggedIn: Bool
     @Published var isEmailVerified: Bool = Auth.auth().currentUser?.isEmailVerified ?? false
     @Published var verificationID: String?
+    @Published var hasProfile: Bool = false
     var currentNonce: String?
     private var appleDelegateHandler: AppleSignInDelegateHandler?
     
@@ -128,6 +129,19 @@ final class AuthManager: ObservableObject {
         isLoggedIn = true
         isEmailVerified = true
         return authResult.user
+    }
+    
+    func checkUserProfile() async {
+        guard let userId = Auth.auth().currentUser?.uid else {
+            hasProfile = false
+            return
+        }
+        do {
+            let user: NovaUser? = try await FirestoreManager.shared.fetchDocument(collection: "users", documentId: userId, as: NovaUser.self)
+            hasProfile = user != nil
+        } catch {
+            hasProfile = false
+        }
     }
     
     func randomNonceString(length: Int = 32) -> String {

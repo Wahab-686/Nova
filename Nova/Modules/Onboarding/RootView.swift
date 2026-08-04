@@ -27,7 +27,10 @@ struct RootView: View {
             } else if authManager.isLoggedIn {
                 if authManager.needsEmailVerification {
                     EmailVerificationView()
-                } else {
+                } else if !authManager.hasProfile {
+                    ProfileSetupView()
+                }
+                else {
                     HomeView()
                 }
             } else if !hasSeenOnboarding {
@@ -40,6 +43,11 @@ struct RootView: View {
                 NavigationStack {
                     LoginView()
                 }
+            }
+        }
+        .task {
+            if authManager.isLoggedIn {
+                await authManager.checkUserProfile()
             }
         }
     }
