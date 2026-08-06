@@ -30,15 +30,16 @@ struct FeedView: View {
                         .foregroundColor(.white.opacity(0.4))
                 }
             } else {
-                ScrollView {
-                    LazyVStack(spacing: 16) {
-                        ForEach(viewModel.posts) {
-                            post in
-                            FeedPostCard(post: post)
+                GeometryReader { outerGeo in
+                    ScrollView {
+                        LazyVStack(spacing: 16) {
+                            ForEach(viewModel.posts) { post in
+                                FeedPostCard(post: post, containerHeight: outerGeo.size.height)
+                            }
                         }
+                        .padding(.horizontal, 16)
+                        .padding(.top, 16)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.top, 16)
                 }
             }
         }
@@ -65,8 +66,29 @@ struct FeedView: View {
 
 struct FeedPostCard: View {
     let post: Post
-    
+    let containerHeight: CGFloat
+
     var body: some View {
+        GeometryReader { geo in
+            let midY = geo.frame(in: .global).midY
+            let distanceFromCenter = midY - containerHeight / 2
+            let normalizedDistance = distanceFromCenter / (containerHeight / 2)
+
+            let scale = 1.0 - min(abs(normalizedDistance) * 0.15, 0.15)
+            let rotation = normalizedDistance * 6
+
+            cardContent
+                .scaleEffect(scale)
+                .rotation3DEffect(
+                    .degrees(rotation),
+                    axis: (x: 1, y: 0, z: 0),
+                    perspective: 0.5
+                )
+        }
+        .frame(height: 380)
+    }
+
+    var cardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 Circle()
@@ -77,25 +99,20 @@ struct FeedPostCard: View {
                     .foregroundColor(.white)
                 Spacer()
             }
-            
-            AsyncImage(url: URL(string: post.imageURL)) {
-                phase in
+
+            AsyncImage(url: URL(string: post.imageURL)) { phase in
                 switch phase {
                 case .empty:
                     RoundedRectangle(cornerRadius: 16)
                         .fill(Color.white.opacity(0.1))
                         .frame(height: 240)
-                        .overlay(
-                            ProgressView()
-                                .tint(.white)
-                        )
+                        .overlay(ProgressView().tint(.white))
                 case .success(let image):
                     image
                         .resizable()
                         .scaledToFill()
                         .frame(height: 240)
                         .clipShape(RoundedRectangle(cornerRadius: 16))
-                    
                 case .failure:
                     RoundedRectangle(cornerRadius: 16)
                         .frame(height: 240)
@@ -104,33 +121,30 @@ struct FeedPostCard: View {
                                 Image(systemName: "exclamationmark.triangle")
                                     .font(.title2)
                                     .foregroundColor(.white)
-                                
                                 Text("Image failed to load")
                                     .font(.footnote)
                                     .foregroundColor(.white)
                             }
                         )
-                    
                 @unknown default:
                     EmptyView()
                 }
             }
-            
+
             Text(post.title)
                 .font(.headline)
                 .foregroundColor(.white)
-            
+
             if !post.description.isEmpty {
                 Text(post.description)
                     .font(.footnote)
                     .foregroundColor(.white.opacity(0.7))
                     .lineLimit(2)
             }
-            
+
             HStack(spacing: 16) {
                 Label("\(post.likeCount)", systemImage: "heart")
                 Label("\(post.commentCount)", systemImage: "bubble.right")
-                
                 Spacer()
                 Text(post.createdAt.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption)
@@ -143,7 +157,7 @@ struct FeedPostCard: View {
         .background(Color.white.opacity(0.05))
         .cornerRadius(20)
     }
-    
+
     func colorFor(_ name: String) -> Color {
         switch name {
         case "purple": return .purple

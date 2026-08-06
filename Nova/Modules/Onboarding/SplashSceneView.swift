@@ -43,3 +43,7 @@ struct SplashSceneView: UIViewRepresentable {
     func updateUIView(_ uiView: SCNView, context: Context) {}
     
 }
+
+#Preview {
+    SplashSceneView()
+}
