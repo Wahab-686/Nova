@@ -34,7 +34,12 @@ struct FeedView: View {
                     ScrollView {
                         LazyVStack(spacing: 16) {
                             ForEach(viewModel.posts) { post in
-                                FeedPostCard(post: post, containerHeight: outerGeo.size.height)
+                                NavigationLink {
+                                    PostDetailView(post: post)
+                                } label: {
+                                    FeedPostCard(post: post, containerHeight: outerGeo.size.height)
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
                         .padding(.horizontal, 16)
@@ -67,6 +72,15 @@ struct FeedView: View {
 struct FeedPostCard: View {
     let post: Post
     let containerHeight: CGFloat
+    
+    @State private var isLiked = false
+    @State private var likeCount: Int
+    
+    init(post: Post, containerHeight: CGFloat) {
+        self.post = post
+        self.containerHeight = containerHeight
+        _likeCount = State(initialValue: post.likeCount)
+    }
 
     var body: some View {
         GeometryReader { geo in
@@ -91,44 +105,39 @@ struct FeedPostCard: View {
     var cardContent: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Circle()
-                    .fill(colorFor(post.shapeColor))
-                    .frame(width: 32, height: 32)
+                RetryableAsyncImage(url: URL(string: post.authorImageURL ?? "")) { image in
+                    image
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 32, height: 32)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Circle()
+                        .fill(colorFor(post.shapeColor).opacity(0.3))
+                        .frame(width: 32, height: 32)
+                        .overlay(
+                            Text(String(post.authorName.prefix(1)).uppercased())
+                                .font(.footnote.bold())
+                                .foregroundColor(colorFor(post.shapeColor))
+                        )
+                }
                 Text(post.authorName)
                     .font(.subheadline.bold())
                     .foregroundColor(.white)
                 Spacer()
             }
 
-            AsyncImage(url: URL(string: post.imageURL)) { phase in
-                switch phase {
-                case .empty:
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.1))
-                        .frame(height: 240)
-                        .overlay(ProgressView().tint(.white))
-                case .success(let image):
-                    image
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 240)
-                        .clipShape(RoundedRectangle(cornerRadius: 16))
-                case .failure:
-                    RoundedRectangle(cornerRadius: 16)
-                        .frame(height: 240)
-                        .overlay(
-                            VStack(spacing: 8) {
-                                Image(systemName: "exclamationmark.triangle")
-                                    .font(.title2)
-                                    .foregroundColor(.white)
-                                Text("Image failed to load")
-                                    .font(.footnote)
-                                    .foregroundColor(.white)
-                            }
-                        )
-                @unknown default:
-                    EmptyView()
-                }
+            RetryableAsyncImage(url: URL(string: post.imageURL)) { image in
+                image
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 240)
+                    .clipShape(RoundedRectangle(cornerRadius: 16))
+            } placeholder: {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(Color.white.opacity(0.1))
+                    .frame(height: 240)
+                    .overlay(ProgressView().tint(.white))
             }
 
             Text(post.title)
@@ -143,7 +152,30 @@ struct FeedPostCard: View {
             }
 
             HStack(spacing: 16) {
-                Label("\(post.likeCount)", systemImage: "heart")
+                Button {
+                    Task {
+                        do {
+                            try await FirestoreManager.shared.toggleLike(postId: post.id)
+                            print("Like toggled for:", post.id)
+                            if isLiked {
+                                likeCount = max(likeCount - 1, 0)
+                            } else {
+                                likeCount += 1
+                            }
+                            
+                            isLiked.toggle()
+                            
+                        } catch {
+                            print(error.localizedDescription)
+                        }
+                    }
+                } label: {
+                    Label(
+                        "\(likeCount)",
+                        systemImage: isLiked ? "heart.fill" : "heart"
+                    )
+                    .foregroundColor(isLiked ? .red : .white.opacity(0.6))
+                }
                 Label("\(post.commentCount)", systemImage: "bubble.right")
                 Spacer()
                 Text(post.createdAt.formatted(date: .abbreviated, time: .omitted))
@@ -156,6 +188,13 @@ struct FeedPostCard: View {
         .padding(16)
         .background(Color.white.opacity(0.05))
         .cornerRadius(20)
+        .task {
+            do {
+                isLiked = try await FirestoreManager.shared.hasLiked(postId: post.id)
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
     }
 
     func colorFor(_ name: String) -> Color {
@@ -170,6 +209,22 @@ struct FeedPostCard: View {
 
 #Preview {
     NavigationStack {
-        FeedView()
+        FeedPostCard(
+            post: Post(
+                id: "1",
+                authorId: "1",
+                authorName: "Wahab",
+                authorImageURL: nil,
+                title: "My First 3D Sculpture",
+                description: "Testing the feed with a sample post",
+                imageURL: "https://picsum.photos/400/300",
+                shapeColor: "purple",
+                likeCount: 12,
+                commentCount: 3,
+                createdAt: Date()
+            ),
+            containerHeight: 800
+        )
     }
+    .padding()
 }

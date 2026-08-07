@@ -31,6 +31,7 @@ final class FeedViewModel: ObservableObject {
                 try doc.data(as: Post.self)
             }
         } catch {
+            print(error)
             errorMessage = error.localizedDescription
         }
         isLoading = false

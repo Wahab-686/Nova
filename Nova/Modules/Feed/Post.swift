@@ -19,4 +19,20 @@ struct Post: Codable, Identifiable {
     var likeCount: Int
     var commentCount: Int
     var createdAt: Date
+
+    var isLiked: Bool = false
+
+    enum CodingKeys: String, CodingKey {
+        case id
+        case authorId
+        case authorName
+        case authorImageURL
+        case title
+        case description
+        case imageURL
+        case shapeColor
+        case likeCount
+        case commentCount
+        case createdAt
+    }
 }
