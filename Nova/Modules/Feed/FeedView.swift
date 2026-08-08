@@ -37,7 +37,11 @@ struct FeedView: View {
                                 NavigationLink {
                                     PostDetailView(post: post)
                                 } label: {
-                                    FeedPostCard(post: post, containerHeight: outerGeo.size.height)
+                                    FeedPostCard(post: post, containerHeight: outerGeo.size.height, onCommentAdded: {
+                                        Task {
+                                            await viewModel.fetchPosts()
+                                        }
+                                    })
                                 }
                                 .buttonStyle(.plain)
                             }
@@ -72,13 +76,16 @@ struct FeedView: View {
 struct FeedPostCard: View {
     let post: Post
     let containerHeight: CGFloat
+    let onCommentAdded: () -> Void
     
     @State private var isLiked = false
     @State private var likeCount: Int
+    @State private var showComments = false
     
-    init(post: Post, containerHeight: CGFloat) {
+    init(post: Post, containerHeight: CGFloat, onCommentAdded: @escaping () -> Void) {
         self.post = post
         self.containerHeight = containerHeight
+        self.onCommentAdded = onCommentAdded
         _likeCount = State(initialValue: post.likeCount)
     }
 
@@ -176,7 +183,17 @@ struct FeedPostCard: View {
                     )
                     .foregroundColor(isLiked ? .red : .white.opacity(0.6))
                 }
-                Label("\(post.commentCount)", systemImage: "bubble.right")
+                
+                Button {
+                    print("COMMENT BUTTON:", post.id)
+                    showComments = true
+                } label: {
+                    Label("\(post.commentCount)", systemImage: "bubble.right")
+                        .foregroundColor(.white)
+                        .padding(8)
+                }
+                .contentShape(Rectangle())
+                
                 Spacer()
                 Text(post.createdAt.formatted(date: .abbreviated, time: .omitted))
                     .font(.caption)
@@ -188,6 +205,13 @@ struct FeedPostCard: View {
         .padding(16)
         .background(Color.white.opacity(0.05))
         .cornerRadius(20)
+        .contentShape(RoundedRectangle(cornerRadius: 20))
+        .sheet(isPresented: $showComments) {
+            PostCommentsView(postId: post.id,
+                             onCommentAdded: onCommentAdded)
+                .presentationDetents([.medium])
+        }
+        
         .task {
             do {
                 isLiked = try await FirestoreManager.shared.hasLiked(postId: post.id)
@@ -223,7 +247,8 @@ struct FeedPostCard: View {
                 commentCount: 3,
                 createdAt: Date()
             ),
-            containerHeight: 800
+            containerHeight: 800,
+            onCommentAdded: {}
         )
     }
     .padding()

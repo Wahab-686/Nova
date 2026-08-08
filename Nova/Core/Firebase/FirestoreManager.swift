@@ -78,4 +78,54 @@ final class FirestoreManager {
             }
         }
     }
+    
+    func addComment(
+        postId: String,
+        text: String,
+        authorName: String,
+    ) async throws {
+        
+        guard let uid = Auth.auth().currentUser?.uid else {
+            return
+        }
+        
+        let commentRef = db
+            .collection("posts")
+            .document(postId)
+            .collection("comments")
+            .document()
+        
+        let postRef = db
+            .collection("posts")
+            .document(postId)
+        
+        let postSnapshot = try await postRef.getDocument()
+        let currentComments = postSnapshot.data()?["commentCount"] as? Int ?? 0
+        
+        let commentData: [String: Any] = [
+            "authorId": uid,
+            "authorName": authorName,
+            "text": text,
+            "createdAt": FieldValue.serverTimestamp()
+        ]
+        
+        try await commentRef.setData(commentData)
+        
+        try await postRef.updateData([
+            "commentCount": currentComments + 1
+        ])
+    }
+    
+    func fetchComments(postId: String) async throws -> [Comment] {
+        let snapshot = try await db
+            .collection("posts")
+            .document(postId)
+            .collection("comments")
+            .order(by: "createdAt", descending: false)
+            .getDocuments()
+        
+        return try snapshot.documents.compactMap {
+            try $0.data(as: Comment.self)
+        }
+    }
 }
